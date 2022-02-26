@@ -21,7 +21,6 @@ def grand_base_controller(connection):
 def threaded_client(connection):
     while True:
         grand_base_controller(connection)
-    connection.close()
 
 
 try:

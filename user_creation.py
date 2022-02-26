@@ -1,13 +1,6 @@
-import openpyxl
 import base64
 
-from user import User
-
-user = User()
-
-user_database_file = openpyxl.load_workbook("user_data_base.xlsx")
-user_database = user_database_file["Sheet1"]
-data_base_next_row = user_database.max_row + 1
+from constants import *
 
 
 def get_and_validate_username(connection):
@@ -15,27 +8,13 @@ def get_and_validate_username(connection):
     while flag:
         username = connection.recv(2048).decode("utf-8")
         print(f"Incoming Username: {username}")
-        if test_name_in_database(username):
+        if test_value_in_database(username, USERNAME_COLUMN):
             connection.sendall(str.encode("valid"))
-            user_database.cell(data_base_next_row, 1).value = username
+            user_database.cell(database_next_row, USERNAME_COLUMN).value = username
             user_database_file.save("user_data_base.xlsx")
             flag = False
         else:
             connection.sendall(str.encode("invalid"))
-
-
-def test_name_in_database(username):
-    user_list = {}
-    for row in range(2, user_database.max_row + 1):
-        usernames = user_database.cell(row, 1).value
-        if usernames not in user_list:
-            user_list[usernames] = 1
-
-    for row in range(2, user_database.max_row + 1):
-        if username not in user_list:
-            return True
-        else:
-            return False
 
 
 def get_and_validate_email(connection):
@@ -43,24 +22,24 @@ def get_and_validate_email(connection):
     while flag:
         email = connection.recv(2048).decode("utf-8")
         print(f"Incoming Email Address: {email}")
-        if test_email_in_database(email):
+        if test_value_in_database(email, EMAIL_COLUMN):
             connection.sendall(str.encode("valid"))
-            user_database.cell(data_base_next_row, 2).value = email
+            user_database.cell(database_next_row, EMAIL_COLUMN).value = email
             user_database_file.save("user_data_base.xlsx")
             flag = False
         else:
             connection.sendall(str.encode("invalid"))
 
 
-def test_email_in_database(email):
-    email_list = {}
+def test_value_in_database(value, column):
+    value_list = {}
     for row in range(2, user_database.max_row + 1):
-        emails = user_database.cell(row, 2).value
-        if emails not in email_list:
-            email_list[emails] = 1
+        values = user_database.cell(row, column).value
+        if values not in value_list:
+            value_list[values] = 1
 
     for row in range(2, user_database.max_row + 1):
-        if email not in email_list:
+        if value not in value_list:
             return True
         else:
             return False
@@ -69,7 +48,7 @@ def test_email_in_database(email):
 def get_and_validate_password(connection):
     password_data = connection.recv(2048)
     encoded = base64.b64encode(password_data)
-    user_database.cell(data_base_next_row, 3).value = encoded
+    user_database.cell(database_next_row, PASSWORD_COLUMN).value = encoded
     user_database_file.save("user_data_base.xlsx")
     print(base64.b64decode(encoded.decode("utf-8")))
 
@@ -81,5 +60,6 @@ def user_creation(connection):
     get_and_validate_email(connection)
     get_and_validate_password(connection)
 
-    user_database.cell(data_base_next_row, 4).value = user.permissions
+    user_database.cell(database_next_row, PERMISSIONS_COLUMN).value = "Standard"
+    user_database.cell(database_next_row, USER_ID_COLUMN).value = user_database.max_row
     user_database_file.save("user_data_base.xlsx")
