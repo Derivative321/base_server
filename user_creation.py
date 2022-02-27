@@ -32,11 +32,11 @@ def get_and_validate_email(connection):
 
 
 def test_value_in_database(value, column):
-    value_list = {}
+    value_list = []
     for row in range(2, user_database.max_row + 1):
         values = user_database.cell(row, column).value
         if values not in value_list:
-            value_list[values] = 1
+            value_list.append(values)
 
     for row in range(2, user_database.max_row + 1):
         if value not in value_list:

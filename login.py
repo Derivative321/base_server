@@ -20,7 +20,7 @@ def handle_login(connection, username):
 
 
 def validate_login(username, encoded):
-    attempts_list = {}
+    attempts_list = []
     for row in range(2, user_database.max_row + 1):
         usernames = user_database.cell(row, USERNAME_COLUMN).value
         emails = user_database.cell(row, EMAIL_COLUMN).value
@@ -34,7 +34,7 @@ def validate_login(username, encoded):
                 user.password = user_database.cell(row, PASSWORD_COLUMN).value
                 user.permissions = user_database.cell(row, PERMISSIONS_COLUMN).value
                 user.user_ID = user_database.cell(row, USER_ID_COLUMN).value
-                attempts_list["success"] = 1
+                attempts_list.append("success")
 
     if "success" in attempts_list:
         return True
